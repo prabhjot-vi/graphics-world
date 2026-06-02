@@ -34,5 +34,3 @@ export class Rect {
     }
 }
 
-export type Triangle = [Vec2, Vec2, Vec2];
-

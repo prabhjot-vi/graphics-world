@@ -1,4 +1,4 @@
-import { Rect, Vec2, type Triangle } from "./common";
+import { Rect, Vec2 } from "./common";
 
 const game = document.getElementById("game") as HTMLCanvasElement;
 if (!game) {
@@ -44,10 +44,10 @@ function point(ndc: Vec2, size: number, colour: string) {
   ctx.stroke();
 }
 
-function triangle(ndc: Triangle, colour: string) {
-  const v0 = ndc_to_canvas(ndc[0]);
-  const v1 = ndc_to_canvas(ndc[1]);
-  const v2 = ndc_to_canvas(ndc[2]);
+function triangle(vertexBuffer: Vec2[], indexBuffer: TriangleVertexIndex, colour: string) {
+  const v0 = ndc_to_canvas(vertexBuffer[indexBuffer[0]]);
+  const v1 = ndc_to_canvas(vertexBuffer[indexBuffer[1]]);
+  const v2 = ndc_to_canvas(vertexBuffer[indexBuffer[2]]);
 
   ctx.strokeStyle = colour;
 
@@ -67,20 +67,32 @@ function triangle(ndc: Triangle, colour: string) {
   ctx.stroke();
 }
 
-const vertexBuffer: Triangle = [
+type TriangleVertexIndex = [number, number, number];
+
+const vertexBuffer: Vec2[] = [
   new Vec2(0.5, -0.5),
-  new Vec2(0, 0.5),
+  new Vec2(-0.5, 0.5),
   new Vec2(-0.5, -0.5),
+  new Vec2(0.5, 0.5),
+]
+
+const indexBuffer: TriangleVertexIndex[] = [
+  [0, 1, 2],
+  [0, 3, 1]
 ]
 
 function render() {
   clear("black");
 
-  for (const v of vertexBuffer) {
-    point({ x: v.x, y: v.y }, 5, "#16c016");
+  for (const v of indexBuffer) {
+    for (const f of v) {
+      point({ x: vertexBuffer[f].x, y: vertexBuffer[f].y }, 5, "#16c016");
+    }
   }
 
-  triangle(vertexBuffer, "#16c016");
+  for (const v of indexBuffer) {
+    triangle(vertexBuffer, v, "#16c016");
+  }
 
   requestAnimationFrame(render);
 }
